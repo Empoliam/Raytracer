@@ -1,5 +1,6 @@
 package tracer;
 
+import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import tracer.shapes.Shape;
 
@@ -8,12 +9,13 @@ public class Intersect {
 	private final double t;
 	private final Vector coords;
 	private final Vector normal;
+	private final Ray inbound; 
 	
-	public Intersect(double t, Vector coords, Shape S) {
+	public Intersect(double t, Vector coords, Shape S, Ray inbound) {
 		
 		this.t = t;
 		this.coords=coords;
-		
+		this.inbound = inbound;
 		normal = S.getNormal(coords);
 		
 	}
@@ -28,6 +30,10 @@ public class Intersect {
 
 	public Vector getNormal() {
 		return normal;
+	}
+
+	public Ray getInbound() {
+		return inbound;
 	}
 
 }

@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 
 import patchi.math.space.Ray;
@@ -53,6 +52,9 @@ public class Raytracer {
 	public void write() {
 
 		BufferedImage output = new BufferedImage(xres, yres, BufferedImage.TYPE_INT_RGB);
+
+		long start = System.nanoTime();
+
 		for(int y = 0; y < yres; y++) {
 
 			int ytransform = yres - 1 - y;
@@ -65,6 +67,8 @@ public class Raytracer {
 			}
 
 		}
+
+		System.out.println("Render in: " + ((System.nanoTime() - start)/1000000));
 
 		try {
 			ImageIO.write(output, "png", new File("output.png"));
@@ -94,12 +98,12 @@ public class Raytracer {
 		Color C = Color.BLACK;
 
 		if(!AA) {
-			
+
 			Ray R = cameraCast(x,y,0d,0d);
 			C = shade(getIntersect(R));		
-			
+
 		} else {
-			
+
 			Ray R0 = cameraCast(x,y,0.5d,0.5d);
 			Color C0 = shade(getIntersect(R0));
 			Ray R1 = cameraCast(x,y,0.5d,-0.5d);
@@ -108,11 +112,11 @@ public class Raytracer {
 			Color C2 = shade(getIntersect(R2));	
 			Ray R3 = cameraCast(x,y,-0.5d,-0.50d);
 			Color C3 = shade(getIntersect(R3));
-			
+
 			C = PatchiColor.average(C0,C1,C2,C3);
-			
+
 		}
-		
+
 		return C;
 
 	}
@@ -147,12 +151,12 @@ public class Raytracer {
 		Color C = Color.BLACK;
 
 		if(I == null) return C;
-		
+
 		Vector dIn = I.getInbound().getDirection();
 		Vector dNorm = I.getNormal();
 
 		double dot = dNorm.dot(dIn.negate());
-				
+
 		int facingShade = (int) (dot * 255d);
 
 		C = new Color(facingShade,facingShade,facingShade);

@@ -5,6 +5,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import javax.imageio.ImageIO;
 
 import patchi.math.space.Ray;
@@ -74,17 +78,33 @@ public class Raytracer {
 		if(xtiles % TILESIZE != 0) xtiles += 1;
 		if(ytiles % TILESIZE != 0) ytiles += 1;
 		
+		ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS, THREADS, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		
 		for(int y = 0; y < ytiles; y ++) {
 			
 			for(int x = 0; x < xtiles; x ++) {				
 				
-				renderTile(output, x * TILESIZE, Math.min(xres, (x+1)*TILESIZE), y * TILESIZE, Math.min(yres,  (x+1)*TILESIZE));
+				final int x0 = x;
+				final int y0 = y;
 				
+				pool.execute(new Runnable() {
+					
+					@Override
+					public void run() {				
+						renderTile(output, x0 * TILESIZE, Math.min(xres, (x0+1)*TILESIZE), y0 * TILESIZE, Math.min(yres, (y0+1)*TILESIZE));			
+					}
+				});
+					
 			}
 			
 		}
 		
-		renderTile(output, 0, xres, 0, yres);
+		pool.shutdown();
+		try {
+			pool.awaitTermination(9, TimeUnit.HOURS);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		
 		System.out.println("Render in: " + ((System.nanoTime() - start)/1000000));
 

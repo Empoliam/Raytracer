@@ -10,7 +10,7 @@ public class Tri extends Shape {
 	private final Vector AB;
 	private final Vector AC;
 	
-	private final Vector normal;
+	private Vector normal;
 	
 	public Tri(Vector A, Vector B, Vector C) {
 				
@@ -22,14 +22,20 @@ public class Tri extends Shape {
 						
 	}
 
+	public void flipNormal() {
+		this.normal = this.normal.negate();
+	}
+	
 	@Override
 	public Intersect intersect(Ray R) {
 		
 		Vector d = R.getDirection();
 		Vector O = R.getOrigin();	
+				
 		Vector AO = new Vector(A,O);
 		
 		double modM = d.negate().dot(AB.cross(AC));
+		if(modM < 0) return null;
 		
 		double t = AO.dot(AB.cross(AC)) / modM;
 		if(t < 0) return null;

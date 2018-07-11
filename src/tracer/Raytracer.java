@@ -18,19 +18,22 @@ public class Raytracer {
 	private Vector CO;
 	private AffineMatrix cspace;
 
-	int xres;
-	int yres;
-	double xsize;
-	double ysize;
+	private final int xres;
+	private final int yres;
+	private final double xsize;
+	private final double ysize;
 
-	private double f;
-	private double fov;
+	private final double f;
+	private final double fov;
 
-	private boolean AA;
+	private final boolean AA;
+
+	private final int THREADS;
+	private final int TILESIZE;
 
 	private ArrayList<Shape> shapes;
 
-	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double f, double fovdeg, boolean AA) {
+	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double f, double fovdeg, boolean AA, int THREADS, int tilesize) {
 
 		shapes = new ArrayList<Shape>();
 
@@ -38,6 +41,16 @@ public class Raytracer {
 		this.f = f;
 
 		this.AA = AA;
+
+		if(THREADS == -1) {
+			this.THREADS = Runtime.getRuntime().availableProcessors();
+		} else if(THREADS == 0) {
+			this.THREADS = 1;
+		} else {
+			this.THREADS = THREADS;
+		}
+
+		this.TILESIZE = tilesize;
 
 		cspace = AffineMatrix.buildMatrix(pitch, yaw, roll, CO);
 
@@ -55,19 +68,24 @@ public class Raytracer {
 
 		long start = System.nanoTime();
 
-		for(int y = 0; y < yres; y++) {
-
-			int ytransform = yres - 1 - y;
-
-			for(int x = 0; x < xres; x++) {
-
-				Color C = renderPixel(x, ytransform);			
-				output.setRGB(x, y, C.getRGB());
-
+		int xtiles = xres / TILESIZE;
+		int ytiles = yres / TILESIZE;
+		
+		if(xtiles % TILESIZE != 0) xtiles += 1;
+		if(ytiles % TILESIZE != 0) ytiles += 1;
+		
+		for(int y = 0; y < ytiles; y ++) {
+			
+			for(int x = 0; x < xtiles; x ++) {				
+				
+				renderTile(output, x * TILESIZE, Math.min(xres, (x+1)*TILESIZE), y * TILESIZE, Math.min(yres,  (x+1)*TILESIZE));
+				
 			}
-
+			
 		}
-
+		
+		renderTile(output, 0, xres, 0, yres);
+		
 		System.out.println("Render in: " + ((System.nanoTime() - start)/1000000));
 
 		try {
@@ -95,22 +113,23 @@ public class Raytracer {
 
 	private Color renderPixel(int x, int y) {
 
+		int ytransform = yres - 1 - y;
 		Color C = Color.BLACK;
 
 		if(!AA) {
 
-			Ray R = cameraCast(x,y,0d,0d);
+			Ray R = cameraCast(x,ytransform,0d,0d);
 			C = shade(getIntersect(R));		
 
 		} else {
 
-			Ray R0 = cameraCast(x,y,0.5d,0.5d);
+			Ray R0 = cameraCast(x,ytransform,0.5d,0.5d);
 			Color C0 = shade(getIntersect(R0));
-			Ray R1 = cameraCast(x,y,0.5d,-0.5d);
+			Ray R1 = cameraCast(x,ytransform,0.5d,-0.5d);
 			Color C1 = shade(getIntersect(R1));	
-			Ray R2 = cameraCast(x,y,-0.5d,0.5d);
+			Ray R2 = cameraCast(x,ytransform,-0.5d,0.5d);
 			Color C2 = shade(getIntersect(R2));	
-			Ray R3 = cameraCast(x,y,-0.5d,-0.50d);
+			Ray R3 = cameraCast(x,ytransform,-0.5d,-0.50d);
 			Color C3 = shade(getIntersect(R3));
 
 			C = PatchiColor.average(C0,C1,C2,C3);
@@ -162,6 +181,20 @@ public class Raytracer {
 		C = new Color(facingShade,facingShade,facingShade);
 		return C;
 
+	}
+
+	private void renderTile(BufferedImage output, int xmin, int xmax, int ymin, int ymax) {
+
+		for(int y = ymin; y < ymax; y++) {
+
+			for(int x = xmin; x < xmax; x++) {
+
+				Color C = renderPixel(x, y);			
+				output.setRGB(x, y, C.getRGB());
+				
+			}
+			
+		}
 	}
 
 }

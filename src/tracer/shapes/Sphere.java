@@ -48,7 +48,7 @@ public class Sphere extends Shape {
 			
 		}
 		
-		return new Intersect(t,R.getPointFromParameter(t),this, R);
+		return new Intersect(t, R.getPointFromParameter(t), this, R);
 		
 	}
 

@@ -33,24 +33,26 @@ public class Tri extends Shape {
 	@Override
 	public Intersect intersect(Ray R) {
 		
-		Vector d = R.getDirection();
+		Vector dN = R.getDirection().negate();
 		Vector O = R.getOrigin();	
 				
 		Vector AO = new Vector(A,O);
 		
-		double modM = d.negate().dot(AB.cross(AC));
-		if(modM < 0) return null;
+		boolean backface = false;
+		
+		double modM = dN.dot(AB.cross(AC));
+		if(modM < 0) backface = true;
 		
 		double t = AO.dot(AB.cross(AC)) / modM;
 		if(t < 0) return null;
 		
-		double u = d.negate().dot(AO.cross(AC)) / modM;
+		double u = dN.dot(AO.cross(AC)) / modM;
 		if(u < 0 || u > 1) return null;
 		
-		double v = d.negate().dot(AB.cross(AO)) / modM;
+		double v = dN.dot(AB.cross(AO)) / modM;
 		if(v < 0 || u > 1 || u+v > 1) return null;
 		
-		return new Intersect(t, R.getPointFromParameter(t), this, R);
+		return new Intersect(t, R.getPointFromParameter(t), this, R, backface);
 		
 	}
 

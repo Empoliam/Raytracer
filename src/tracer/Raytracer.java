@@ -206,8 +206,8 @@ public class Raytracer {
 
 	private Color getColor(Intersect I) {
 
-		if(I == null) return Color.BLACK;
-
+		if(I == null || I.getBackface()) return Color.BLACK;
+		
 		Color C = I.getShape().getColor();
 
 		for(Light L : lights) {

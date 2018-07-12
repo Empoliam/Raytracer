@@ -1,5 +1,7 @@
 package tracer.shapes;
 
+import java.awt.Color;
+
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import tracer.Intersect;
@@ -9,8 +11,10 @@ public class Sphere extends Shape {
 	double radius;
 	Vector centre;
 
-	public Sphere(double radius, Vector centre) {
+	public Sphere(double radius, Vector centre, Color color) {
 
+		super(color);
+		
 		this.radius = radius;
 		this.centre = centre;
 	}

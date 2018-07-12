@@ -10,12 +10,14 @@ public class Intersect {
 	private final Vector coords;
 	private final Vector normal;
 	private final Ray inbound; 
+	private final Shape shape;
 	
 	public Intersect(double t, Vector coords, Shape S, Ray inbound) {
 		
 		this.t = t;
 		this.coords=coords;
 		this.inbound = inbound;
+		this.shape = S;
 		normal = S.getNormal(coords);
 		
 	}
@@ -34,6 +36,10 @@ public class Intersect {
 
 	public Ray getInbound() {
 		return inbound;
+	}
+
+	public Shape getShape() {
+		return shape;
 	}
 
 }

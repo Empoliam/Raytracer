@@ -1,5 +1,7 @@
 package tracer;
 
+import java.awt.Color;
+
 import patchi.math.space.Vector;
 import tracer.shapes.Sphere;
 import tracer.shapes.Tri;
@@ -22,12 +24,12 @@ public class Main {
 				
 		Raytracer R = new Raytracer(CAMERA_ORIGIN, CAMERA_PITCH, CAMERA_YAW, CAMERA_ROLL, XRES, YRES, FOCAL_LENGTH, FOV, AA, THREADS, TILE_SIZE);
 				
-		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(1d,1d,-1d), new Vector(-1d, 1d,-1d)));
-		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(1d,-1d,-1d), new Vector(1d,1d,-1d)));
-		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,-1d,-1d), new Vector(1d,-1d,-1d)));
-		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,1d,-1d), new Vector(-1d,-1d,-1d)));
+		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(1d,1d,-1d), new Vector(-1d, 1d,-1d), Color.RED));
+		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(1d,-1d,-1d), new Vector(1d,1d,-1d), Color.WHITE));
+		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,-1d,-1d), new Vector(1d,-1d,-1d), Color.RED));
+		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,1d,-1d), new Vector(-1d,-1d,-1d), Color.WHITE));
 		
-		R.addShape(new Sphere(0.3d, new Vector(0d,0d,0d)));
+		R.addShape(new Sphere(0.3d, new Vector(0d,0d,0d), Color.CYAN));
 		
 		R.write();
 		

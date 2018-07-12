@@ -1,5 +1,7 @@
 package tracer.shapes;
 
+import java.awt.Color;
+
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import tracer.Intersect;
@@ -12,8 +14,10 @@ public class Tri extends Shape {
 	
 	private Vector normal;
 	
-	public Tri(Vector A, Vector B, Vector C) {
+	public Tri(Vector A, Vector B, Vector C, Color color) {
 				
+		super(color);
+		
 		this.A = A;
 		AB = new Vector(A, B);
 		AC = new Vector(A, C);

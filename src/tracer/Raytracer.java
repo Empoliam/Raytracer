@@ -185,20 +185,19 @@ public class Raytracer {
 
 	}
 
+	
 	private Color shade(Intersect I) {
-
-		Color C = Color.BLACK;
-
-		if(I == null) return C;
+		
+		if(I == null) return Color.BLACK;
+		Color C = I.getShape().getColor();
 
 		Vector dIn = I.getInbound().getDirection();
 		Vector dNorm = I.getNormal();
 
 		double dot = dNorm.dot(dIn.negate());
 
-		int facingShade = (int) (dot * 255d);
-
-		C = new Color(facingShade,facingShade,facingShade);
+		C = PatchiColor.scalarMultiply(C, (float) dot);
+		
 		return C;
 
 	}

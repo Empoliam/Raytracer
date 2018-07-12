@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import patchi.util.PatchiColor;
+import tracer.light.Light;
+import tracer.shader.FacingRatioShader;
 import tracer.shapes.Shape;
 
 public class Raytracer {
@@ -31,15 +33,18 @@ public class Raytracer {
 	private final double fov;
 
 	private final boolean AA;
+	private double BIAS = 1e-8;
 
 	private final int THREADS;
 	private final int TILESIZE;
 
 	private ArrayList<Shape> shapes;
+	private ArrayList<Light> lights;
 
 	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double f, double fovdeg, boolean AA, int THREADS, int tilesize) {
 
 		shapes = new ArrayList<Shape>();
+		lights = new ArrayList<Light>();
 
 		this.CO = CO;
 		this.f = f;
@@ -74,39 +79,39 @@ public class Raytracer {
 
 		int xtiles = xres / TILESIZE;
 		int ytiles = yres / TILESIZE;
-		
+
 		if(xtiles % TILESIZE != 0) xtiles += 1;
 		if(ytiles % TILESIZE != 0) ytiles += 1;
-		
+
 		ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS, THREADS, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-		
+
 		for(int y = 0; y < ytiles; y ++) {
-			
+
 			for(int x = 0; x < xtiles; x ++) {				
-				
+
 				final int x0 = x;
 				final int y0 = y;
-				
+
 				pool.execute(new Runnable() {
-					
+
 					@Override
 					public void run() {				
 						renderTile(output, x0 * TILESIZE, Math.min(xres, (x0+1)*TILESIZE), y0 * TILESIZE, Math.min(yres, (y0+1)*TILESIZE));			
 					}
 				});
-					
+
 			}
-			
+
 		}
-		
+
 		pool.shutdown();
 		try {
 			pool.awaitTermination(9, TimeUnit.HOURS);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		
-		System.out.println("Render in: " + ((System.nanoTime() - start)/1000000));
+
+		System.out.println("Render in: " + ((System.nanoTime() - start)/1000000000d) + "s");
 
 		try {
 			ImageIO.write(output, "png", new File("output.png"));
@@ -118,6 +123,10 @@ public class Raytracer {
 
 	public void addShape(Shape S) {
 		shapes.add(S);
+	}
+
+	public void addLight(Light L) {
+		lights.add(L);
 	}
 
 	private Ray cameraCast(int px, int py, double shiftx, double shifty) {
@@ -139,18 +148,18 @@ public class Raytracer {
 		if(!AA) {
 
 			Ray R = cameraCast(x,ytransform,0d,0d);
-			C = shade(getIntersect(R));		
+			C = getColor(getIntersect(R));		
 
 		} else {
 
 			Ray R0 = cameraCast(x,ytransform,0.5d,0.5d);
-			Color C0 = shade(getIntersect(R0));
+			Color C0 = getColor(getIntersect(R0));
 			Ray R1 = cameraCast(x,ytransform,0.5d,-0.5d);
-			Color C1 = shade(getIntersect(R1));	
+			Color C1 = getColor(getIntersect(R1));	
 			Ray R2 = cameraCast(x,ytransform,-0.5d,0.5d);
-			Color C2 = shade(getIntersect(R2));	
+			Color C2 = getColor(getIntersect(R2));	
 			Ray R3 = cameraCast(x,ytransform,-0.5d,-0.50d);
-			Color C3 = shade(getIntersect(R3));
+			Color C3 = getColor(getIntersect(R3));
 
 			C = PatchiColor.average(C0,C1,C2,C3);
 
@@ -185,19 +194,36 @@ public class Raytracer {
 
 	}
 
-	
-	private Color shade(Intersect I) {
-		
+	private Intersect getIntersect(Ray R, double cull) {
+
+		Intersect I = getIntersect(R);
+		if(I == null) return null;
+		double t = I.getT();
+		if(t*t > cull) return null;
+		return I;
+
+	}
+
+	private Color getColor(Intersect I) {
+
 		if(I == null) return Color.BLACK;
+
 		Color C = I.getShape().getColor();
 
-		Vector dIn = I.getInbound().getDirection();
-		Vector dNorm = I.getNormal();
+		for(Light L : lights) {
 
-		double dot = dNorm.dot(dIn.negate());
+			Vector shadowCorrection = I.getCoords().add(I.getNormal().scalarMult(BIAS));
+			Vector lightDir = L.getDirection(shadowCorrection);
 
-		C = PatchiColor.scalarMultiply(C, (float) dot);
-		
+			Ray R = new Ray(shadowCorrection, lightDir);
+			Intersect J = getIntersect(R, L.getDistanceSquare(I.getCoords()));
+
+			if(J != null) C = Color.BLACK;
+
+		}
+
+		C = new FacingRatioShader().shade(I, C);
+
 		return C;
 
 	}
@@ -210,9 +236,9 @@ public class Raytracer {
 
 				Color C = renderPixel(x, y);			
 				output.setRGB(x, y, C.getRGB());
-				
+
 			}
-			
+
 		}
 	}
 

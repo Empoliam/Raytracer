@@ -29,9 +29,9 @@ public class Main {
 		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,-1d,-1d), new Vector(1d,-1d,-1d), Color.RED));
 		R.addShape(new Tri(new Vector(0d,0d,-2d), new Vector(-1d,1d,-1d), new Vector(-1d,-1d,-1d), Color.WHITE));
 		
-		//R.addShape(new Sphere(0.3d, new Vector(0d,0d,0d), Color.CYAN));
+		R.addShape(new Sphere(0.3d, new Vector(0d,-0.3d,0d), Color.CYAN));
 		
-		R.addShape(new Tri(new Vector(-0.25d,0d,0d), new Vector(0.25d,0d,0d), new Vector(0d,0.5d,0d), Color.CYAN));
+		R.addShape(new Tri(new Vector(-0.25d,0.25d,0d), new Vector(0.25d,0.25d,0d), new Vector(0d,0.75d,0d), Color.CYAN));
 		
 		R.addLight(new tracer.light.PointLight(new Vector(0d,0d,2d), 1d));
 		

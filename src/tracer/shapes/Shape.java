@@ -14,7 +14,7 @@ public abstract class Shape {
 		COLOR = color;
 	}
 	
-	public abstract Intersect intersect(Ray R);
+	public abstract Intersect intersect(Ray R, boolean cullBackface);
 
 	public abstract Vector getNormal(Vector V);
 	

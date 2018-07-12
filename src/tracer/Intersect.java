@@ -11,16 +11,14 @@ public class Intersect {
 	private final Vector normal;
 	private final Ray inbound; 
 	private final Shape shape;
-	private final boolean backface;
 	
-	public Intersect(double t, Vector coords, Shape S, Ray inbound, boolean backface) {
+	public Intersect(double t, Vector coords, Shape S, Ray inbound) {
 		
 		this.t = t;
 		this.coords=coords;
 		this.inbound = inbound;
 		this.shape = S;
 		normal = S.getNormal(coords);
-		this.backface = backface;
 		
 	}
 
@@ -42,10 +40,6 @@ public class Intersect {
 
 	public Shape getShape() {
 		return shape;
-	}
-
-	public boolean getBackface() {
-		return backface;
 	}
 
 }

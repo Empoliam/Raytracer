@@ -20,7 +20,7 @@ public class Sphere extends Shape {
 	}
 
 	@Override
-	public Intersect intersect(Ray R) {
+	public Intersect intersect(Ray R, boolean cullBackface) {
 	
 		Vector dir = R.getDirection();
 		Vector rayor = new Vector(centre,R.getOrigin());
@@ -52,7 +52,7 @@ public class Sphere extends Shape {
 			
 		}
 		
-		return new Intersect(t, R.getPointFromParameter(t), this, R, false);
+		return new Intersect(t, R.getPointFromParameter(t), this, R);
 		
 	}
 

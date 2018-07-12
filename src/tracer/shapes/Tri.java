@@ -31,17 +31,15 @@ public class Tri extends Shape {
 	}
 	
 	@Override
-	public Intersect intersect(Ray R) {
+	public Intersect intersect(Ray R, boolean cullBackface) {
 		
 		Vector dN = R.getDirection().negate();
 		Vector O = R.getOrigin();	
 				
 		Vector AO = new Vector(A,O);
-		
-		boolean backface = false;
-		
+				
 		double modM = dN.dot(AB.cross(AC));
-		if(modM < 0) backface = true;
+		if(modM < 0 && cullBackface) return null;
 		
 		double t = AO.dot(AB.cross(AC)) / modM;
 		if(t < 0) return null;
@@ -52,7 +50,7 @@ public class Tri extends Shape {
 		double v = dN.dot(AB.cross(AO)) / modM;
 		if(v < 0 || u > 1 || u+v > 1) return null;
 		
-		return new Intersect(t, R.getPointFromParameter(t), this, R, backface);
+		return new Intersect(t, R.getPointFromParameter(t), this, R);
 		
 	}
 

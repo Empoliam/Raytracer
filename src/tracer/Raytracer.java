@@ -148,18 +148,18 @@ public class Raytracer {
 		if(!AA) {
 
 			Ray R = cameraCast(x,ytransform,0d,0d);
-			C = getColor(getIntersect(R));		
+			C = getColor(getIntersect(R,true));		
 
 		} else {
 
 			Ray R0 = cameraCast(x,ytransform,0.5d,0.5d);
-			Color C0 = getColor(getIntersect(R0));
+			Color C0 = getColor(getIntersect(R0,true));
 			Ray R1 = cameraCast(x,ytransform,0.5d,-0.5d);
-			Color C1 = getColor(getIntersect(R1));	
+			Color C1 = getColor(getIntersect(R1,true));	
 			Ray R2 = cameraCast(x,ytransform,-0.5d,0.5d);
-			Color C2 = getColor(getIntersect(R2));	
+			Color C2 = getColor(getIntersect(R2,true));	
 			Ray R3 = cameraCast(x,ytransform,-0.5d,-0.50d);
-			Color C3 = getColor(getIntersect(R3));
+			Color C3 = getColor(getIntersect(R3,true));
 
 			C = PatchiColor.average(C0,C1,C2,C3);
 
@@ -169,13 +169,13 @@ public class Raytracer {
 
 	}
 
-	private Intersect getIntersect(Ray R) {
+	private Intersect getIntersect(Ray R, boolean cullBackface) {
 
 		Intersect V = null;
 
 		for(Shape S : shapes) {
 
-			Intersect n = S.intersect(R);
+			Intersect n = S.intersect(R, cullBackface);
 
 			if(n != null) {
 				if(V != null) {
@@ -194,19 +194,19 @@ public class Raytracer {
 
 	}
 
-	private Intersect getIntersect(Ray R, double cull) {
+	private Intersect getIntersect(Ray R, double maxDistance, boolean cullBackface) {
 
-		Intersect I = getIntersect(R);
+		Intersect I = getIntersect(R, cullBackface);
 		if(I == null) return null;
 		double t = I.getT();
-		if(t*t > cull) return null;
+		if(t*t > maxDistance) return null;
 		return I;
 
 	}
 
 	private Color getColor(Intersect I) {
 
-		if(I == null || I.getBackface()) return Color.BLACK;
+		if(I == null) return Color.BLACK;
 		
 		Color C = I.getShape().getColor();
 
@@ -216,7 +216,7 @@ public class Raytracer {
 			Vector lightDir = L.getDirection(shadowCorrection);
 
 			Ray R = new Ray(shadowCorrection, lightDir);
-			Intersect J = getIntersect(R, L.getDistanceSquare(I.getCoords()));
+			Intersect J = getIntersect(R, L.getDistanceSquare(I.getCoords()), false);
 
 			if(J != null) C = Color.BLACK;
 

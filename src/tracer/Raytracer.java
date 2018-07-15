@@ -143,23 +143,23 @@ public class Raytracer {
 		int ytransform = yres - 1 - y;
 		Color C = Color.BLACK;
 
-		if(!AA) {
+		if(AA) {
 
-			Ray R = cameraCast(x,ytransform,0d,0d);
-			C = getColor(getIntersect(R,true));		
+			Ray R0 = cameraCast(x,ytransform,-0.1d,-0.35d);
+			Color C0 = getColor(getIntersect(R0,true));
+			Ray R1 = cameraCast(x,ytransform,0.35d,-0.1d);
+			Color C1 = getColor(getIntersect(R1,true));	
+			Ray R2 = cameraCast(x,ytransform,0.1d,0.35d);
+			Color C2 = getColor(getIntersect(R2,true));	
+			Ray R3 = cameraCast(x,ytransform,-0.35d,0.1d);
+			Color C3 = getColor(getIntersect(R3,true));
+
+			C = PatchiColor.average(C0,C1,C2,C3);	
 
 		} else {
 
-			Ray R0 = cameraCast(x,ytransform,0.5d,0.5d);
-			Color C0 = getColor(getIntersect(R0,true));
-			Ray R1 = cameraCast(x,ytransform,0.5d,-0.5d);
-			Color C1 = getColor(getIntersect(R1,true));	
-			Ray R2 = cameraCast(x,ytransform,-0.5d,0.5d);
-			Color C2 = getColor(getIntersect(R2,true));	
-			Ray R3 = cameraCast(x,ytransform,-0.5d,-0.50d);
-			Color C3 = getColor(getIntersect(R3,true));
-
-			C = PatchiColor.average(C0,C1,C2,C3);
+			Ray R = cameraCast(x,ytransform,0d,0d);
+			C = getColor(getIntersect(R,true));	
 
 		}
 

@@ -1,22 +1,23 @@
 package tracer.shapes;
 
-import java.awt.Color;
-
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
+import tracer.AffineMatrix;
 import tracer.Intersect;
+import tracer.shader.Material;
 
 public class Sphere extends Shape {
 
 	double radius;
 	Vector centre;
 
-	public Sphere(double radius, Vector centre, Color color) {
+	public Sphere(double radius, AffineMatrix M, Material mat) {
 
-		super(color);
+		super(mat, M);
 		
 		this.radius = radius;
-		this.centre = centre;
+		this.centre = M.transform(new Vector(0d,0d,0d));
+		
 	}
 
 	@Override

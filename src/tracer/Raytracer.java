@@ -15,7 +15,7 @@ import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import patchi.util.PatchiColor;
 import tracer.light.Light;
-import tracer.shader.FacingRatioShader;
+import tracer.shader.Shader;
 import tracer.shapes.Shape;
 
 public class Raytracer {
@@ -29,11 +29,9 @@ public class Raytracer {
 	private final double xsize;
 	private final double ysize;
 
-	private final double f;
 	private final double fov;
 
 	private final boolean AA;
-	private double BIAS = 1e-8;
 
 	private final int THREADS;
 	private final int TILESIZE;
@@ -41,13 +39,12 @@ public class Raytracer {
 	private ArrayList<Shape> shapes;
 	private ArrayList<Light> lights;
 
-	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double f, double fovdeg, boolean AA, int THREADS, int tilesize) {
+	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double fovdeg, boolean AA, int THREADS, int tilesize) {
 
 		shapes = new ArrayList<Shape>();
 		lights = new ArrayList<Light>();
 
 		this.CO = CO;
-		this.f = f;
 
 		this.AA = AA;
 
@@ -66,7 +63,7 @@ public class Raytracer {
 		this.xres = xres;
 		this.yres = yres;
 		fov = Math.toRadians(fovdeg);
-		xsize = 2 * f * Math.tan(fov*0.5);
+		xsize = 2 * Math.tan(fov*0.5);
 		ysize = (yres * xsize) / xres; 
 
 	}
@@ -80,9 +77,10 @@ public class Raytracer {
 		int xtiles = xres / TILESIZE;
 		int ytiles = yres / TILESIZE;
 
-		if(xtiles % TILESIZE != 0) xtiles += 1;
-		if(ytiles % TILESIZE != 0) ytiles += 1;
+		if(xtiles % TILESIZE != 0 || xtiles == 0) xtiles += 1;
+		if(ytiles % TILESIZE != 0 || ytiles == 0) ytiles += 1;
 
+		
 		ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS, THREADS, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 		for(int y = 0; y < ytiles; y ++) {
@@ -131,10 +129,10 @@ public class Raytracer {
 
 	private Ray cameraCast(int px, int py, double shiftx, double shifty) {
 
-		double cx = (((double)px + shiftx)/ xres) * xsize - (xsize*0.5d);
-		double cy = (((double)py + shifty)/ yres) * ysize - (ysize*0.5d);
+		double cx = (((double)(px+0.5d) + shiftx)/ xres) * xsize - (xsize*0.5d);
+		double cy = (((double)(py+0.5d) + shifty)/ yres) * ysize - (ysize*0.5d);
 
-		Vector dir = new Vector(CO, cspace.transform(new Vector(cx, cy, -f)));
+		Vector dir = new Vector(CO, cspace.transform(new Vector(cx, cy, -1d)));
 
 		return new Ray(CO, dir);
 
@@ -194,7 +192,7 @@ public class Raytracer {
 
 	}
 
-	private Intersect getIntersect(Ray R, double maxDistance, boolean cullBackface) {
+	public Intersect getIntersect(Ray R, double maxDistance, boolean cullBackface) {
 
 		Intersect I = getIntersect(R, cullBackface);
 		if(I == null) return null;
@@ -207,22 +205,18 @@ public class Raytracer {
 	private Color getColor(Intersect I) {
 
 		if(I == null) return Color.BLACK;
-		
-		Color C = I.getShape().getColor();
 
-		for(Light L : lights) {
+		Shape O = I.getShape();
+		Color C = null;
 
-			Vector shadowCorrection = I.getCoords().add(I.getNormal().scalarMult(BIAS));
-			Vector lightDir = L.getDirection(shadowCorrection);
-
-			Ray R = new Ray(shadowCorrection, lightDir);
-			Intersect J = getIntersect(R, L.getDistanceSquare(I.getCoords()), false);
-
-			if(J != null) C = Color.BLACK;
-
+		for(Shader S : O.getShaders()) {
+			Color N = S.shade(I);
+			if(C == null) { 
+				C = N;
+			} else {
+				C = PatchiColor.blend(C, N);
+			}
 		}
-
-		C = new FacingRatioShader().shade(I, C);
 
 		return C;
 
@@ -240,6 +234,10 @@ public class Raytracer {
 			}
 
 		}
+	}
+
+	public ArrayList<Light> getLights() {
+		return lights;
 	}
 
 }

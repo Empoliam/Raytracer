@@ -1,25 +1,30 @@
 package tracer.shapes;
 
-import java.awt.Color;
+import java.util.LinkedList;
 
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
+import tracer.AffineMatrix;
 import tracer.Intersect;
+import tracer.shader.Material;
+import tracer.shader.Shader;
 
 public abstract class Shape {
 
-	protected Color COLOR;
-
-	protected Shape(Color color) {
-		COLOR = color;
+	protected Material MATERIAL;
+	protected AffineMatrix OBJECT_SPACE;
+	
+	protected Shape(Material mat, AffineMatrix M) {
+		MATERIAL = mat;
+		OBJECT_SPACE = M;
 	}
 	
 	public abstract Intersect intersect(Ray R, boolean cullBackface);
 
 	public abstract Vector getNormal(Vector V);
-	
-	public Color getColor() {
-		return COLOR;
+		
+	public LinkedList<Shader> getShaders() {
+		return MATERIAL.getShaders();
 	}
 	
 }

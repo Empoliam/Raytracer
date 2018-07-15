@@ -3,7 +3,7 @@ package tracer.light;
 import patchi.math.space.Vector;
 
 public class PointLight extends Light {
-	
+		
 	private Vector origin;
 	
 	public PointLight(Vector O, double intensity) {
@@ -21,7 +21,11 @@ public class PointLight extends Light {
 
 	@Override
 	public double getIntensity(Vector P) {
-		return super.intensity;
+		
+		Vector V = new Vector(P,origin);
+		double rsquare = V.dot(V);
+		return super.intensity / (4d * Math.PI * rsquare);
+		
 	}
 
 	@Override
@@ -30,6 +34,4 @@ public class PointLight extends Light {
 		return V.dot(V);
 	}
 	
-		
-
 }

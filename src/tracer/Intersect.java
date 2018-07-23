@@ -12,13 +12,13 @@ public class Intersect {
 	private final Ray inbound; 
 	private final Shape shape;
 	
-	public Intersect(double t, Vector coords, Shape S, Ray inbound) {
+	public Intersect(double t, Vector coords, Shape S, Ray inbound, Vector normal) {
 		
 		this.t = t;
 		this.coords=coords;
 		this.inbound = inbound;
 		this.shape = S;
-		normal = S.getNormal(coords);
+		this.normal = normal;
 		
 	}
 

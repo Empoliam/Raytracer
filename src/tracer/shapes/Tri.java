@@ -54,13 +54,9 @@ public class Tri extends Shape {
 		double v = dN.dot(AB.cross(AO)) / modM;
 		if(v < 0 || u > 1 || u+v > 1) return null;
 
-		return new Intersect(t, R.getPointFromParameter(t), this, R);
+		return new Intersect(t, R.getPointFromParameter(t), this, R, normal);
 
 	}
 
-	@Override
-	public Vector getNormal(Vector V) {
-		return normal;
-	}
 
 }

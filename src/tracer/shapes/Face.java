@@ -40,9 +40,4 @@ public class Face extends Shape {
 		return I;
 	}
 
-	@Override
-	public Vector getNormal(Vector V) {
-		return TRI.get(0).getNormal(V);
-	}
-
 }

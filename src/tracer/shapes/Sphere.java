@@ -53,11 +53,12 @@ public class Sphere extends Shape {
 			
 		}
 		
-		return new Intersect(t, R.getPointFromParameter(t), this, R);
+		Vector O = R.getPointFromParameter(t);
+		
+		return new Intersect(t, O, this, R, getNormal(O));
 		
 	}
 
-	@Override
 	public Vector getNormal(Vector V) {
 
 		return new Vector(centre, V).normalize();

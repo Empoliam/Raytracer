@@ -5,10 +5,12 @@ import patchi.math.space.Vector;
 public class AffineMatrix {
 
 	private final double[][] MATRIX;
+	private final Vector ORIGIN;
 
 	public AffineMatrix(double[][] in) {
 
 		MATRIX = in;
+		this.ORIGIN = new Vector(in[0][3],in[1][3],in[2][3]);
 
 	}
 
@@ -44,8 +46,12 @@ public class AffineMatrix {
 		
 	}
 
-	public double[][] getMATRIX() {
+	public double[][] getMatrix() {
 		return MATRIX;
 	}
 
+	public Vector getOrigin() {
+		return ORIGIN;
+	}
+	
 }

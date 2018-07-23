@@ -3,7 +3,6 @@ package tracer.shapes;
 import java.util.LinkedList;
 
 import patchi.math.space.Ray;
-import patchi.math.space.Vector;
 import tracer.AffineMatrix;
 import tracer.Intersect;
 import tracer.shader.Material;
@@ -20,8 +19,6 @@ public abstract class Shape {
 	}
 	
 	public abstract Intersect intersect(Ray R, boolean cullBackface);
-
-	public abstract Vector getNormal(Vector V);
 		
 	public LinkedList<Shader> getShaders() {
 		return MATERIAL.getShaders();

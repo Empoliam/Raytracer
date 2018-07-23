@@ -14,8 +14,6 @@ public class Plane extends Shape {
 
 		super(mat, M);
 		normal = new Vector(M.getOrigin(),M.transform(new Vector(0d,1d,0d)));
-		
-		System.out.println(normal.dot(normal));
 
 	}
 

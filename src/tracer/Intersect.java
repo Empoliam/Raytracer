@@ -21,7 +21,7 @@ public class Intersect {
 		this.normal = normal;
 		
 	}
-
+	
 	public double getT() {
 		return t;
 	}

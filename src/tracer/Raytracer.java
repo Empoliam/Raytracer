@@ -15,6 +15,7 @@ import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import patchi.util.PatchiColor;
 import tracer.light.Light;
+import tracer.shader.ReflectionShader;
 import tracer.shader.Shader;
 import tracer.shapes.Shape;
 
@@ -32,16 +33,17 @@ public class Raytracer {
 	private final double FOV;
 
 	private final double BIAS;
-	
+
 	private final boolean AA;
+	private final int MAX_BOUNCES = 1024;
 	private final int THREADS;
 	private final int TILESIZE;
-	
+
 	private ArrayList<Shape> shapes;
 	private ArrayList<Light> lights;
 
-	private Color BACKGROUND = PatchiColor.scalarMultiply(Color.WHITE, 0.2f);
-	
+	private Color BACKGROUND = PatchiColor.scalarMultiply(Color.BLACK, 0.2f);
+
 	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double fovdeg, boolean AA, int THREADS, int tilesize, double BIAS) {
 
 		shapes = new ArrayList<Shape>();
@@ -70,7 +72,7 @@ public class Raytracer {
 		ysize = (yres * xsize) / xres; 
 
 		this.BIAS = BIAS;
-		
+
 	}
 
 	public void write() {
@@ -85,7 +87,7 @@ public class Raytracer {
 		if(xtiles % TILESIZE != 0 || xtiles == 0) xtiles += 1;
 		if(ytiles % TILESIZE != 0 || ytiles == 0) ytiles += 1;
 
-		
+
 		ThreadPoolExecutor pool = new ThreadPoolExecutor(THREADS, THREADS, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 		for(int y = 0; y < ytiles; y ++) {
@@ -152,19 +154,23 @@ public class Raytracer {
 
 			Ray R0 = cameraCast(x,ytransform,-0.1d,-0.35d);
 			Color C0 = getColor(getIntersect(R0,true));
+			ReflectionShader.resetDepth();
 			Ray R1 = cameraCast(x,ytransform,0.35d,-0.1d);
 			Color C1 = getColor(getIntersect(R1,true));	
+			ReflectionShader.resetDepth();
 			Ray R2 = cameraCast(x,ytransform,0.1d,0.35d);
 			Color C2 = getColor(getIntersect(R2,true));	
+			ReflectionShader.resetDepth();
 			Ray R3 = cameraCast(x,ytransform,-0.35d,0.1d);
 			Color C3 = getColor(getIntersect(R3,true));
-
+			ReflectionShader.resetDepth();
 			C = PatchiColor.average(C0,C1,C2,C3);	
 
 		} else {
 
 			Ray R = cameraCast(x,ytransform,0d,0d);
 			C = getColor(getIntersect(R,true));	
+			ReflectionShader.resetDepth();
 
 		}
 
@@ -222,7 +228,7 @@ public class Raytracer {
 				C = PatchiColor.blend(C, N);
 			}
 		}
-
+			
 		return C;
 
 	}
@@ -252,9 +258,13 @@ public class Raytracer {
 	public ArrayList<Shape> getShapes() {
 		return shapes;
 	}
-	
+
 	public Color getBGColor() {
 		return BACKGROUND;
+	}
+	
+	public int getMaxBounces() {
+		return MAX_BOUNCES;
 	}
 	
 }

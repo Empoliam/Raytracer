@@ -11,6 +11,8 @@ import tracer.Raytracer;
 
 public class ReflectionShader implements Shader {
 
+	private static int DEPTH = 0;
+	
 	private final Raytracer RAYTRACER;
 
 	private final Color COLOR;
@@ -28,9 +30,16 @@ public class ReflectionShader implements Shader {
 
 	@Override
 	public Color shade(Intersect I) {
-
+		
+		DEPTH++;
+		
 		Color C = RAYTRACER.getBGColor(); 
 
+		if(DEPTH > RAYTRACER.getMaxBounces()) {
+			DEPTH = 0;
+			return C;
+		}
+		
 		Vector N = I.getNormal();
 		Vector D = I.getInbound().getDirection();
 		Vector O = I.getCoords().add(N.scalarMult(BIAS));
@@ -48,8 +57,13 @@ public class ReflectionShader implements Shader {
 			C = PatchiColor.scalarMultiply(C, REFLECTIVITY);
 			C = PatchiColor.linearDodge(C,Dif);	
 		}
+		
 		return C;
 
 	}
-
+	
+	public static void resetDepth() {
+		DEPTH = 0;
+	}
+	
 }

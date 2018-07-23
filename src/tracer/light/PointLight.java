@@ -1,17 +1,27 @@
 package tracer.light;
 
+import java.awt.Color;
+
 import patchi.math.space.Vector;
 
 public class PointLight extends Light {
-		
+
 	private Vector origin;
-	
+
 	public PointLight(Vector O, double intensity) {
-		
+
 		super(intensity);	
-		
+
 		this.origin = O;
-		
+
+	}
+
+	public PointLight(Vector O, double intensity, Color C) {
+
+		super(intensity,C);	
+
+		this.origin = O;
+
 	}
 
 	@Override
@@ -21,11 +31,11 @@ public class PointLight extends Light {
 
 	@Override
 	public double getIntensity(Vector P) {
-		
+
 		Vector V = new Vector(P,origin);
 		double rsquare = V.dot(V);
 		return super.intensity / (4d * Math.PI * rsquare);
-		
+
 	}
 
 	@Override
@@ -33,5 +43,5 @@ public class PointLight extends Light {
 		Vector V = new Vector(P, origin);
 		return V.dot(V);
 	}
-	
+
 }

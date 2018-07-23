@@ -52,7 +52,8 @@ public class DiffuseShader implements Shader {
 				colors.add(Color.BLACK);
 			} else {	
 				double m = L.getIntensity(P) * ALBEDO * dot;
-				colors.add(PatchiColor.scalarMultiply(COLOR, (float) m));	
+				Color C = PatchiColor.scalarMultiply(COLOR, (float) m);
+				colors.add(PatchiColor.multiply(C, L.getColor()));	
 			}		
 		}
 		

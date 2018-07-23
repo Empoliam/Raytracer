@@ -41,7 +41,7 @@ public class ReflectionShader implements Shader {
 
 		Intersect reflection = RAYTRACER.getIntersect(refRay, true);
 
-		C = RAYTRACER.getColor(reflection);
+		C = PatchiColor.multiply(RAYTRACER.getColor(reflection),COLOR);
 
 		if(REFLECTIVITY != 1f) {
 			Color Dif = new DiffuseShader(COLOR, 1d - (double)REFLECTIVITY, RAYTRACER).shade(I);

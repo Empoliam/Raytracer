@@ -20,10 +20,13 @@ public class DiffuseShader implements Shader {
 	private final Color COLOR;
 	private final double ALBEDO;
 	
-	public DiffuseShader(Color color, double albedo, Raytracer R, ArrayList<Light> lights, double bias) {
-		LIGHTS = lights;
-		BIAS = bias;
+	public DiffuseShader(Color color, double albedo, Raytracer R) {
+
 		RAYTRACER = R;
+		
+		LIGHTS = R.getLights();
+		BIAS = R.getBias();
+		
 		COLOR = color;
 		ALBEDO = albedo / Math.PI;
 	}

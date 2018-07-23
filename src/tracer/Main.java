@@ -5,6 +5,7 @@ import java.awt.Color;
 import patchi.math.space.Vector;
 import tracer.shader.DiffuseShader;
 import tracer.shader.Material;
+import tracer.shader.ReflectionShader;
 import tracer.shapes.Face;
 import tracer.shapes.Sphere;
 
@@ -20,21 +21,24 @@ public class Main {
 	private static final boolean AA = true;
 	private static final int THREADS = -1;
 	private static final int TILE_SIZE = 256;
+	private static final double BIAS = 1e-8;
 	
 	public static void main(String[] args) {
 				
-		Raytracer R = new Raytracer(CAMERA_ORIGIN, CAMERA_PITCH, CAMERA_YAW, CAMERA_ROLL, XRES, YRES, FOV, AA, THREADS, TILE_SIZE);
+		Raytracer R = new Raytracer(CAMERA_ORIGIN, CAMERA_PITCH, CAMERA_YAW, CAMERA_ROLL, XRES, YRES, FOV, AA, THREADS, TILE_SIZE, BIAS);
 		
-		R.addLight(new tracer.light.PointLight(new Vector(2d,2d,-2d), 1360d));
+		R.addLight(new tracer.light.PointLight(new Vector(2d,2d,2d), 1360d));
 		R.addLight(new tracer.light.PointLight(CAMERA_ORIGIN, 50d));
 		
 		AffineMatrix O = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(0d,0d,0d));
 		AffineMatrix M = AffineMatrix.buildMatrix(0d, 25d, 0d, new Vector(0d,0.25d,0d));
-		AffineMatrix S = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(-1d,0.25d,-1d));
+		AffineMatrix S = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(1d,0.25d,-1d));
 				
-		Material WHITE = new Material(new DiffuseShader(Color.WHITE,0.18d,R,R.getLights(),1e-8));
-		Material CYAN = new Material(new DiffuseShader(Color.CYAN,0.5d,R,R.getLights(),1e-8));
-		Material RED = new Material(new DiffuseShader(Color.RED,0.5d,R,R.getLights(),1e-8));
+		Material WHITE = new Material(new DiffuseShader(Color.WHITE,0.18d,R));
+		Material CYAN = new Material(new DiffuseShader(Color.CYAN,0.5d,R));
+		Material RED = new Material(new DiffuseShader(Color.RED,0.5d,R));
+		
+		Material REFLECT = new Material(new ReflectionShader(Color.BLACK, 1d, R));
 				
 		R.addShape(new Face(WHITE, O, new Vector(20d,0d,20d), new Vector(20d,0d,-20d), new Vector(-20d,0d,-20d), new Vector(-20d,0d,20d)));
 		
@@ -45,7 +49,7 @@ public class Main {
 		R.addShape(new Face(CYAN, M, new Vector(-0.25d,0.25d,0.25d), new Vector(-0.25d,0.25d,-0.25d), new Vector(-0.25d,-0.25d,-0.25d), new Vector(-0.25d,-0.25d,0.25d)));
 		R.addShape(new Face(CYAN, M, new Vector(0.25d,-0.25d,0.25d), new Vector(-0.25d,-0.25d,0.25d), new Vector(-0.25d,-0.25d,-0.25d), new Vector(0.25d,-0.25d,-0.25d)));
 				
-		R.addShape(new Sphere(0.25, S, RED));
+		R.addShape(new Sphere(0.25, S, REFLECT));
 		
 		R.write();
 		

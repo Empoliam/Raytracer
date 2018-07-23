@@ -29,17 +29,20 @@ public class Raytracer {
 	private final double xsize;
 	private final double ysize;
 
-	private final double fov;
+	private final double FOV;
 
+	private final double BIAS;
+	
 	private final boolean AA;
-
 	private final int THREADS;
 	private final int TILESIZE;
-
+	
 	private ArrayList<Shape> shapes;
 	private ArrayList<Light> lights;
 
-	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double fovdeg, boolean AA, int THREADS, int tilesize) {
+	private Color BACKGROUND = PatchiColor.scalarMultiply(Color.WHITE, 0.2f);
+	
+	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double fovdeg, boolean AA, int THREADS, int tilesize, double BIAS) {
 
 		shapes = new ArrayList<Shape>();
 		lights = new ArrayList<Light>();
@@ -62,10 +65,12 @@ public class Raytracer {
 
 		this.xres = xres;
 		this.yres = yres;
-		fov = Math.toRadians(fovdeg);
-		xsize = 2 * Math.tan(fov*0.5);
+		FOV = Math.toRadians(fovdeg);
+		xsize = 2 * Math.tan(FOV*0.5);
 		ysize = (yres * xsize) / xres; 
 
+		this.BIAS = BIAS;
+		
 	}
 
 	public void write() {
@@ -167,7 +172,7 @@ public class Raytracer {
 
 	}
 
-	private Intersect getIntersect(Ray R, boolean cullBackface) {
+	public Intersect getIntersect(Ray R, boolean cullBackface) {
 
 		Intersect V = null;
 
@@ -202,9 +207,9 @@ public class Raytracer {
 
 	}
 
-	private Color getColor(Intersect I) {
+	public Color getColor(Intersect I) {
 
-		if(I == null) return Color.BLACK;
+		if(I == null) return BACKGROUND;
 
 		Shape O = I.getShape();
 		Color C = null;
@@ -240,4 +245,16 @@ public class Raytracer {
 		return lights;
 	}
 
+	public double getBias() {
+		return BIAS;
+	}
+
+	public ArrayList<Shape> getShapes() {
+		return shapes;
+	}
+	
+	public Color getBGColor() {
+		return BACKGROUND;
+	}
+	
 }

@@ -31,6 +31,24 @@ public class AffineMatrix {
 		});
 
 	}
+	
+	public static AffineMatrix buildMatrix(double pitch, double yaw, double roll, Vector translation, double scale) {
+		
+		double[][] A = buildMatrix(pitch, yaw, roll, translation).getMatrix();
+		
+		A[0][0] *= scale;
+		A[0][1] *= scale;
+		A[0][2] *= scale;
+		A[1][0] *= scale;
+		A[1][1] *= scale;
+		A[1][2] *= scale;
+		A[2][0] *= scale;
+		A[2][1] *= scale;
+		A[2][2] *= scale;
+		
+		return new AffineMatrix(A);
+		
+	}
 
 	public Vector transform(Vector V) {
 		

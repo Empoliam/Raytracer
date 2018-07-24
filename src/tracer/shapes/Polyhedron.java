@@ -25,8 +25,16 @@ public class Polyhedron extends Shape {
 		Intersect I = null;
 
 		for(Face F : FACE) {
-			I = F.intersect(R, cullBackface);
-			if(I != null) break;
+			Intersect P = F.intersect(R, cullBackface);
+			
+			if(P != null) {
+				if(I == null) {
+					I = P;
+				} else if (I.getT() > P.getT()) {
+					I = P;
+				}
+			}
+			
 		}
 
 		return I;
@@ -41,7 +49,7 @@ public class Polyhedron extends Shape {
 
 	public static Polyhedron buildCube(Material mat, AffineMatrix M, double sideLength) {
 
-		
+
 		double dF = sideLength * 0.5d;
 		Polyhedron P = new Polyhedron(mat, M);
 

@@ -35,16 +35,25 @@ public class Main {
 		Raytracer R = new Raytracer(CAMERA_ORIGIN, CAMERA_PITCH, CAMERA_YAW, CAMERA_ROLL, XRES, YRES, FOV, AA, THREADS, TILE_SIZE, BIAS);
 
 		R.addLight(new PointLight(new Vector(2d,2d,2d), 800d, Color.WHITE));
+		R.addLight(new PointLight(new Vector(-2d,2d,2d), 800d, Color.WHITE));
 
-		Material TMat = new Material(new DiffuseShader(Color.WHITE,0.3d,R));
-		AffineMatrix TMx = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(0d,0d,-1d), 0.5d);
+		Material TMat = new Material(new DiffuseShader(Color.YELLOW,0.3d,R));
+		AffineMatrix TMx = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(1d,0d,-1d), 0.25d);
 		Polyhedron TEAPOT = loadOBJ(new File("teapot.obj"), TMat, TMx);
+		TEAPOT.calculateBounds();
+		
+		Material T2Mat = new Material(new DiffuseShader(Color.CYAN,0.3d,R));
+		AffineMatrix T2Mx = AffineMatrix.buildMatrix(0d, 180d, 0d, new Vector(-1d,0d,-1d), 0.25d);
+		Polyhedron TEAPOT2 = loadOBJ(new File("teapot.obj"), T2Mat, T2Mx);
+		TEAPOT2.calculateBounds();
+		
 		
 		Material PMat = new Material(new ReflectionShader(Color.WHITE, 0.9d, R));
 		AffineMatrix PMx = AffineMatrix.buildMatrix(0d, 0d, 0d, new Vector(0d,0d,0d));
 		Plane PLANE = new Plane(PMat, PMx);		
 		
 		R.addShape(TEAPOT);
+		R.addShape(TEAPOT2);
 		R.addShape(PLANE);
 
 		R.write();

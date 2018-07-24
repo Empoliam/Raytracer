@@ -40,4 +40,8 @@ public class Face extends Shape {
 		return I;
 	}
 
+	public ArrayList<Tri> getTris() {
+		return TRI;
+	}
+	
 }

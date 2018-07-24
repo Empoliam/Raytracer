@@ -5,17 +5,20 @@ import java.util.ArrayList;
 import patchi.math.space.Ray;
 import patchi.math.space.Vector;
 import tracer.AffineMatrix;
+import tracer.BoundingBox;
 import tracer.Intersect;
 import tracer.shader.Material;
 
 public class Polyhedron extends Shape {
 
 	private ArrayList<Face> FACE;
+	private BoundingBox BOUNDS;
 
 	public Polyhedron(Material mat, AffineMatrix M) {
 
 		super(mat, M);
 		FACE = new ArrayList<Face>();		
+		calculateBounds();
 
 	}
 
@@ -24,15 +27,19 @@ public class Polyhedron extends Shape {
 
 		Intersect I = null;
 
-		for(Face F : FACE) {
-			Intersect P = F.intersect(R, cullBackface);
+		if(BOUNDS.intersect(R)) {
 			
-			if(P != null) {
-				if(I == null) {
-					I = P;
-				} else if (I.getT() > P.getT()) {
-					I = P;
+			for(Face F : FACE) {
+				Intersect P = F.intersect(R, cullBackface);
+
+				if(P != null) {
+					if(I == null) {
+						I = P;
+					} else if (I.getT() > P.getT()) {
+						I = P;
+					}
 				}
+
 			}
 			
 		}
@@ -61,6 +68,16 @@ public class Polyhedron extends Shape {
 		P.addFace(new Vector(dF,-dF,dF), new Vector(-dF,-dF,dF), new Vector(-dF,-dF,-dF), new Vector(dF,-dF,-dF));
 
 		return P;
+	}
+
+	public ArrayList<Face> getFaces() {
+		return FACE;
+	}
+
+	public void calculateBounds() {
+
+		BOUNDS = new BoundingBox(this);
+
 	}
 
 }

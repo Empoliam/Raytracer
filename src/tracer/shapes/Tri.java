@@ -9,6 +9,8 @@ import tracer.shader.Material;
 public class Tri extends Shape {
 
 	private final Vector A;
+	private final Vector B;
+	private final Vector C;
 	private final Vector AB;
 	private final Vector AC;
 
@@ -23,6 +25,8 @@ public class Tri extends Shape {
 		Vector C = M.transform(iC);
 		
 		this.A = A;
+		this.B = B;
+		this.C = C;
 		AB = new Vector(A, B);
 		AC = new Vector(A, C);
 
@@ -56,6 +60,18 @@ public class Tri extends Shape {
 
 		return new Intersect(t, R.getPointFromParameter(t), this, R, normal);
 
+	}
+
+	public Vector getA() {
+		return A;
+	}
+	
+	public Vector getB() {
+		return B;
+	}
+
+	public Vector getC() {
+		return C;
 	}
 
 

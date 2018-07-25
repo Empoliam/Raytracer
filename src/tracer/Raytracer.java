@@ -42,7 +42,7 @@ public class Raytracer {
 	private ArrayList<Shape> shapes;
 	private ArrayList<Light> lights;
 
-	private Color BACKGROUND = PatchiColor.scalarMultiply(Color.BLACK, 0.2f);
+	private Color BACKGROUND = PatchiColor.scalarMultiply(Color.WHITE, 0.9f);
 
 	public Raytracer(Vector CO, double pitch, double yaw, double roll, int xres, int yres, double fovdeg, boolean AA, int THREADS, int tilesize, double BIAS) {
 
@@ -96,7 +96,7 @@ public class Raytracer {
 
 				final int x0 = x;
 				final int y0 = y;
-
+				
 				pool.execute(new Runnable() {
 
 					@Override
@@ -238,7 +238,7 @@ public class Raytracer {
 		for(int y = ymin; y < ymax; y++) {
 
 			for(int x = xmin; x < xmax; x++) {
-
+				
 				Color C = renderPixel(x, y);			
 				output.setRGB(x, y, C.getRGB());
 

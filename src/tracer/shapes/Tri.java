@@ -11,6 +11,7 @@ public class Tri extends Shape {
 	private final Vector A;
 	private final Vector B;
 	private final Vector C;
+	private final Vector mid;
 	private final Vector AB;
 	private final Vector AC;
 
@@ -27,6 +28,13 @@ public class Tri extends Shape {
 		this.A = A;
 		this.B = B;
 		this.C = C;
+		
+		this.mid = new Vector(
+				(A.getX() + B.getX() + C.getX()) / 3d,
+				(A.getY() + B.getY() + C.getY()) / 3d,
+				(A.getZ() + B.getZ() + C.getZ()) / 3d
+				);
+		
 		AB = new Vector(A, B);
 		AC = new Vector(A, C);
 
@@ -72,6 +80,10 @@ public class Tri extends Shape {
 
 	public Vector getC() {
 		return C;
+	}
+
+	public Vector getMid() {
+		return mid;
 	}
 
 

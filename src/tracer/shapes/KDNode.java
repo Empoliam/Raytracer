@@ -17,82 +17,90 @@ public class KDNode {
 	 * 2 z
 	 */
 	int axis;
-	double mid;
 	boolean leaf;
 
 	KDNode leftnode;
 	KDNode rightnode;
 
 
-	public KDNode(Collection<Tri> tris) {
+	public KDNode(Collection<Tri> tris, int depth) {
 
 		box = new BoundingBox(tris);
 		leaf = false;
 
-		if(tris.size() > 20) {
-									
-			double xl = box.getXmax() - box.getXmin();
-			double yl = box.getYmax() - box.getYmin();
-			double zl = box.getZmax() - box.getZmin();
+		//		System.out.println(box);
+		//		System.out.println("axis: " + axis);
+		//		System.out.println("tris: " + tris.size());	
 
-			if(xl > yl && xl > zl) {
+		if(depth < 20 && tris.size() > 5) {
+
+			double l[] = new double[3];
+
+			l[0] = box.getXmax() - box.getXmin();
+			l[1] = box.getYmax() - box.getYmin();
+			l[2] = box.getZmax() - box.getZmin();
+
+			double splitpoint = 0d;
+
+			if(l[0] > l[1] && l[0] > l[2]) {
 				axis = 0;
-				for(Tri T : tris) {
-					mid += T.getMid().getX();
-				};
-				mid /= tris.size();
-			} else if (yl > zl && yl > xl) {
+			} else if (l[1] > l[2] && l[1] > l[0]) {
 				axis = 1;
-				for(Tri T : tris) {
-					mid += T.getMid().getY();
-				};
-				mid /= tris.size();
 			} else {
 				axis = 2;
-				for(Tri T : tris) {
-					mid += T.getMid().getZ();
-				};
-				mid /= tris.size();
 			}
+
+			double cost = Double.POSITIVE_INFINITY;
+
+			for(double s = 0.2d; s <= 0.8d; s += 0.2d) {
+
+				double splittest = box.getImin(axis) + (s * l[1]);
+
+				int ls = 0;
+				int rs = 0;
+
+				for(Tri T : tris) {
+					if(T.getMid().getI(axis) < splittest) {
+						ls++;
+					} else {
+						rs++;
+					};
+				};
+
+				double ncost = 1d + (s * ls * 10d) + ((1d - s) * rs * 10d);
+
+				if(ncost < cost) {
+					cost = ncost;
+					splitpoint = splittest;
+				}
+
+			} 
+
+			//System.out.println("split at: " + splitpoint);
 
 			LinkedList<Tri> left = new LinkedList<Tri>();
 			LinkedList<Tri> right = new LinkedList<Tri>();
 
 			for(Tri T : tris) {
-				switch(axis) {
 
-				case 0: if(T.getMid().getX() <= mid) { 
+				//System.out.println(T.getMid().getI(axis));
+
+				if(T.getMid().getI(axis) <= splitpoint) { 
 					left.add(T);
 				} else {
 					right.add(T); 
 				}
-				break;
 
-				case 1: if(T.getMid().getY() <= mid) { 
-					left.add(T);
-				} else {
-					right.add(T); 
-				}
-				break;
-
-				case 2: if(T.getMid().getZ() <= mid) { 
-					left.add(T);
-				} else {
-					right.add(T); 
-				}
-				break;
-
-				}
 			}
-			
-			leftnode = new KDNode(left);
-			rightnode = new KDNode(right);
+
+			leftnode = new KDNode(left, depth+1);
+			rightnode = new KDNode(right, depth+1);
 
 		} else {
 			leaf = true;
 			TRIS = tris;
 		}
-		
+
 	}
 
 	public Intersect intersect(Ray R, boolean cullBackface) {
@@ -105,7 +113,7 @@ public class KDNode {
 
 				Intersect LI = leftnode.intersect(R, cullBackface);
 				Intersect RI = rightnode.intersect(R, cullBackface);
-							
+
 				if(LI == null && RI == null) {
 					I = null;
 				} else if (LI == null) {

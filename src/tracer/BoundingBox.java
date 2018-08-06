@@ -11,14 +11,14 @@ public class BoundingBox {
 	private double[] x;
 	private double[] y;
 	private double[] z;
-	
+
 	public BoundingBox(Collection<Tri> tris) {
 
 		boolean init = false;
 		x = new double[2];
 		y = new double[2];
 		z = new double[2];
-		
+
 		for(Tri T : tris) {
 
 			double txm = Math.min(T.getA().getX(), Math.min(T.getB().getX(), T.getC().getX()));
@@ -27,7 +27,7 @@ public class BoundingBox {
 			double txx = Math.max(T.getA().getX(), Math.max(T.getB().getX(), T.getC().getX()));
 			double tyx = Math.max(T.getA().getY(), Math.max(T.getB().getY(), T.getC().getY()));
 			double tzx = Math.max(T.getA().getZ(), Math.max(T.getB().getZ(), T.getC().getZ()));
-			
+
 			if(init) {
 
 				x[1] = txx;
@@ -36,9 +36,9 @@ public class BoundingBox {
 				y[0] = tym;
 				z[1] = tzx;
 				z[0] = tzm;
-				
+
 				init = true;
-				
+
 			} else {
 
 				if(txx > x[1]) x[1] = txx;
@@ -52,7 +52,7 @@ public class BoundingBox {
 
 			}
 		}
-		
+
 	}
 
 	public boolean intersect(Ray R) {
@@ -80,12 +80,12 @@ public class BoundingBox {
 		double tzmax = (z[1 - sign[2]] - O.getZ()) / D.getZ();
 
 		if(tmin > tzmax || tzmin > tmax) return false;	
-		
+
 		if(tzmin > tmin) tmin = tzmin;
 		if(tzmax < tmax) tmax = tzmax;
 
 		if(tzmin < 0 && tzmax < 0) return false;
-		
+
 		return true;
 
 	}
@@ -118,6 +118,34 @@ public class BoundingBox {
 
 	public double getZmin() {
 		return z[0];
+	}
+
+	public double getImin(int index) {
+
+		switch (index) {
+
+		case 0 : return x[0];
+		case 1 : return y[0];
+		case 2 : return z[0];
+
+		}
+
+		return Double.NaN;
+
+	}
+	
+	public double getImax(int index) {
+
+		switch (index) {
+
+		case 0 : return x[1];
+		case 1 : return y[1];
+		case 2 : return z[1];
+
+		}
+
+		return Double.NaN;
+
 	}
 
 }

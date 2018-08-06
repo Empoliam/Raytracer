@@ -17,10 +17,10 @@ public class Main {
 	private static final double CAMERA_PITCH = -10d;
 	private static final double CAMERA_YAW = 0d;
 	private static final double CAMERA_ROLL = 0d;
-	private static final int XRES = 1920;
-	private static final int YRES = 1080;
+	private static final int XRES = 128*2;
+	private static final int YRES = 72*2;
 	private static final double FOV = 50d;
-	private static final boolean AA = true;
+	private static final boolean AA = false;
 	private static final int THREADS = -1;
 	private static final int TILE_SIZE = 256;
 	private static final double BIAS = 1e-8;

@@ -50,8 +50,9 @@ public class Polyhedron extends Shape {
 	}
 	
 	public void calculateTree() {
-		KDTREE = new KDNode(TRIS);
-		System.out.println("Tree calculated");
+		long start = System.nanoTime();
+		KDTREE = new KDNode(TRIS,0);
+		System.out.println("Tree calculated in: " + ((System.nanoTime() - start)/1000000000d) + "s");
 	}
 		
 	public static Polyhedron buildCube(Material mat, AffineMatrix M, double sideLength) {
@@ -73,7 +74,9 @@ public class Polyhedron extends Shape {
 	public static Polyhedron loadOBJ(File F, Material mat, AffineMatrix M) {
 
 		try {
-						
+				
+			long start = System.nanoTime();
+			
 			BufferedReader br = new BufferedReader(new FileReader(F));
 
 			LinkedList<Vector> vertexes = new LinkedList<>();
@@ -109,6 +112,9 @@ public class Polyhedron extends Shape {
 			}
 			
 			br.close();
+			
+			System.out.println("Object load in: " + ((System.nanoTime() - start)/1000000000d) + "s");
+			
 			return P; 
 			
 		} catch (FileNotFoundException e) {
@@ -116,7 +122,7 @@ public class Polyhedron extends Shape {
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
-
+		
 		return null;
 
 	}
